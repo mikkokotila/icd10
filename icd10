@@ -1,0 +1,70 @@
+from pandas import Series
+
+# SOURCE: http://www.icd10data.com/ICD10CM/Codes
+
+class ICD10():
+    
+    def __init__(self, codes):
+
+        self.codes = codes
+        self.codes = self._to_list()
+        self.lookup_table = self._create_dict()
+        self.out = self._lookup()
+        self.summary = self._summary()
+        
+    def _summary(self):
+        
+        return Series(self.out).value_counts()
+        
+        
+    def _lookup(self):
+        
+        out = []
+        
+        for code in self.codes:
+            try:
+                cat = self.lookup_table[code[0]]
+            except KeyError:
+                try:
+                    cat = self.lookup_table[code[0:2]]
+                except KeyError:
+                    cat = 'na'
+            out.append(cat)
+            
+        return out
+
+        
+    def _to_list(self):
+        
+        if type(self.codes) != type([]):
+            return list(self.codes)
+        else:
+            return self.codes
+
+    def _create_dict(self):
+
+        top = {}
+
+        top['A'] = top['B'] = 'infection_parasites'
+        top['C'] = top['D0'] = top['D1'] = top['D2'] = top['D3'] = top['D4'] = 'neoplasms'
+        top['D5'] = top['D6'] = top['D7'] = top['D8'] = top['D9'] = 'blood_immune'
+        top['E'] = 'endocrine_nutrition_metabolism'
+        top['F'] = 'mental_behavioral_neuro'
+        top['G'] = 'nervous_system'
+        top['H0'] = top['H1'] = top['H2'] = top['H3'] = top['H4'] = top['H5'] = 'eye_adnexa'
+        top['H6'] = top['H7'] = top['H8'] = top['H9'] = 'ear_mastoid'
+        top['I'] = 'circulatory'
+        top['J'] = 'respiratory'
+        top['K'] = 'digestive'
+        top['L'] = 'skin_subcutanous'
+        top['M'] = 'muscuskeletal_connective'
+        top['N'] = 'genitourinary'
+        top['O'] = 'pregrancy_birth'
+        top['P'] = 'perinatal'
+        top['Q'] = 'congenital_chromosomal'
+        top['R'] = 'unclassified'
+        top['S'] = 'injrury_poisoning_other'
+        top['V'] = 'external_causes'
+        top['Z'] = 'other_factors'
+
+        return top
